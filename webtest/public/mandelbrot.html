@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mandelbrot Demo</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+      body { background: #0a0f14; }
+      main { max-width: 960px; }
+      .controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom: 12px; }
+      .controls label { color: var(--muted); }
+      .controls input[type="range"] { width: 200px; }
+      canvas { width: 100%; height: auto; background:#000; border:1px solid rgba(255,255,255,0.08); border-radius: 8px; }
+      .hint { color: var(--muted); margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Mandelbrot Set</h1>
+      <p class="subtitle">Interactive canvas rendering. Click to zoom in; Shift+Click to zoom out.</p>
+
+      <div class="controls">
+        <button id="zoomIn">Zoom In</button>
+        <button id="zoomOut">Zoom Out</button>
+        <button id="reset">Reset</button>
+        <label>Iterations: <span id="iterVal">200</span></label>
+        <input id="iter" type="range" min="50" max="1500" step="10" value="200" />
+        <label>Coloring:</label>
+        <select id="palette">
+          <option value="hsl" selected>HSL Smooth</option>
+          <option value="blue">Blue</option>
+          <option value="fire">Fire</option>
+        </select>
+      </div>
+
+      <canvas id="canvas" width="960" height="600"></canvas>
+      <p class="hint">Tip: Drag the window wider for more resolution. Rendering is progressive by rows.</p>
+      <p><a href="/">← Back</a></p>
+    </main>
+
+    <script src="/mandelbrot.js"></script>
+  </body>
+  </html>
+

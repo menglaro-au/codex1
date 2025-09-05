@@ -1,10 +1,14 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const url = require('url');
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
+const HTTPS_PORT = process.env.HTTPS_PORT ? parseInt(process.env.HTTPS_PORT, 10) : null;
+const SSL_CERT_PATH = process.env.SSL_CERT_PATH || path.join(__dirname, 'certs', 'server.crt');
+const SSL_KEY_PATH = process.env.SSL_KEY_PATH || path.join(__dirname, 'certs', 'server.key');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 function getContentType(filePath) {
@@ -47,7 +51,7 @@ function getLocalIPs() {
   return results;
 }
 
-const server = http.createServer((req, res) => {
+const requestHandler = (req, res) => {
   const parsed = url.parse(req.url, true);
   const pathname = parsed.pathname || '/';
 
@@ -87,10 +91,27 @@ const server = http.createServer((req, res) => {
   }
 
   serveStatic(res, filePath);
-});
+};
 
-server.listen(PORT, () => {
-  // eslint-disable-next-line no-console
+// HTTP server
+const httpServer = http.createServer(requestHandler);
+httpServer.listen(PORT, () => {
   console.log(`webtest listening on http://0.0.0.0:${PORT}`);
 });
 
+// Optional HTTPS server if configured or certs exist
+function tryStartHttps() {
+  if (!HTTPS_PORT) return;
+  try {
+    const key = fs.readFileSync(SSL_KEY_PATH);
+    const cert = fs.readFileSync(SSL_CERT_PATH);
+    const httpsServer = https.createServer({ key, cert }, requestHandler);
+    httpsServer.listen(HTTPS_PORT, () => {
+      console.log(`webtest listening on https://0.0.0.0:${HTTPS_PORT}`);
+    });
+  } catch (e) {
+    console.error('HTTPS not started:', e.message);
+  }
+}
+
+tryStartHttps();
